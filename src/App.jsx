@@ -6,13 +6,15 @@ import RateTable from './components/RateTable';
 import CurrencyConverter from './components/CurrencyConverter';
 import './App.css';
 
-const socket = io('http://localhost:5000');
+// const socket = io('http://localhost:500'); 
+const socket = io(process.env.REACT_APP_BACKEND_URL)
 
 function App() {
   const [rate, setRate] = useState({});
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/rates/current')
+    // axios.get('http://localhost:5000/api/rates/current') 
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/rates/current`)
       .then(res => {
         if (res.data.success) {
           setRate({ rate: res.data.rates });
