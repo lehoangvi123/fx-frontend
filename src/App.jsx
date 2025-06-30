@@ -6,29 +6,36 @@ import RateTable from './components/RateTable';
 import CurrencyConverter from './components/CurrencyConverter';
 import './App.css';
 
-// const socket = io('http://localhost:500'); 
-const socket = io(process.env.REACT_APP_BACKEND_URL)
+// Biến môi trường cho backend
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+
+// Socket kết nối
+const socket = io(BACKEND_URL);
 
 function App() {
-  const [rate, setRate] = useState({});
+  const [rate, setRate] = useState(null);
 
   useEffect(() => {
-    // axios.get('http://localhost:5000/api/rates/current') 
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/rates/current`)
+    // Gọi API tỷ giá
+    axios.get(`${BACKEND_URL}/api/rates/current`)
       .then(res => {
-        if (res.data.success) {
+        if (res.data && res.data.success && res.data.rates) {
           setRate({ rate: res.data.rates });
         } else {
-          console.warn('⚠ No rates available yet');
+          console.warn('⚠ No exchange rates returned from API.');
         }
       })
       .catch(err => console.error('❌ API error:', err));
 
-    socket.on('rateUpdate', data => { 
+    // Lắng nghe sự kiện real-time
+    socket.on('rateUpdate', data => {
+      console.log('🔄 Real-time update received:', data);
       setRate(data);
     });
 
-    return () => socket.disconnect();
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   return (
@@ -51,12 +58,12 @@ function App() {
       <main className="container mx-auto flex-1 p-6">
         <Routes>
           <Route path="/" element={
-            rate.rate ? (
+            rate && rate.rate ? (
               <div className="grid md:grid-cols-2 gap-6">
                 <RateTable rates={rate.rate} />
                 <CurrencyConverter />
               </div>
-            ) : ( 
+            ) : (
               <div className="flex justify-center items-center h-64">
                 <p className="text-lg text-gray-500 animate-pulse">Loading exchange rates...</p>
               </div>
@@ -76,7 +83,7 @@ function App() {
             <a href="/terms" className="hover:underline">Terms</a>
             <a href="/support" className="hover:underline">Support</a>
           </div>
-        </div> 
+        </div>
       </footer>
     </div>
   );
