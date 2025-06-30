@@ -24,7 +24,7 @@ function App() {
       })
       .catch(err => console.error('❌ API error:', err));
 
-    socket.on('rateUpdate', data => {
+    socket.on('rateUpdate', data => { 
       setRate(data);
     });
 
@@ -56,7 +56,7 @@ function App() {
                 <RateTable rates={rate.rate} />
                 <CurrencyConverter />
               </div>
-            ) : (
+            ) : ( 
               <div className="flex justify-center items-center h-64">
                 <p className="text-lg text-gray-500 animate-pulse">Loading exchange rates...</p>
               </div>
