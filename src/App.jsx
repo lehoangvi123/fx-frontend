@@ -16,21 +16,21 @@ function App() {
   const [rate, setRate] = useState(null);
 
   useEffect(() => {
-    // Gọi API tỷ giá
+    // Gọi API lấy tỷ giá hiện tại
     axios.get(`${BACKEND_URL}/api/rates/current`)
       .then(res => {
         if (res.data && res.data.success && res.data.rates) {
-          setRate({ rate: res.data.rates });
+          setRate(res.data.rates); // ✅ Dữ liệu tỷ giá là object phẳng
         } else {
           console.warn('⚠ No exchange rates returned from API.');
         }
       })
       .catch(err => console.error('❌ API error:', err));
 
-    // Lắng nghe sự kiện real-time
+    // Lắng nghe cập nhật real-time từ WebSocket
     socket.on('rateUpdate', data => {
       console.log('🔄 Real-time update received:', data);
-      setRate(data);
+      setRate(data); // ✅ Đồng nhất kiểu dữ liệu
     });
 
     return () => {
@@ -58,9 +58,9 @@ function App() {
       <main className="container mx-auto flex-1 p-6">
         <Routes>
           <Route path="/" element={
-            rate && rate.rate ? (
+            rate && Object.keys(rate).length > 0 ? (
               <div className="grid md:grid-cols-2 gap-6">
-                <RateTable rates={rate.rate} />
+                <RateTable rates={rate} />
                 <CurrencyConverter />
               </div>
             ) : (
