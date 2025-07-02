@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react';
+import { Link, Routes, Route } from 'react-router-dom';
 import io from 'socket.io-client';
 import axios from 'axios';
-import { Link, Routes, Route } from 'react-router-dom';
 import RateTable from './components/RateTable';
 import CurrencyConverter from './components/CurrencyConverter';
-import './App.css';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Setting from './pages/Setting';
+import './App.css'; 
+import CrossRateConverter from './components/CrossRateConverter';
+
 
 // Biến môi trường cho backend
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
-// Socket kết nối
+// Kết nối socket
 const socket = io(BACKEND_URL);
 
 function App() {
@@ -19,18 +24,18 @@ function App() {
     // Gọi API lấy tỷ giá hiện tại
     axios.get(`${BACKEND_URL}/api/rates/current`)
       .then(res => {
-        if (res.data && res.data.success && res.data.rates) {
-          setRate(res.data.rates); // ✅ Dữ liệu tỷ giá là object phẳng
+        if (res.data?.success && res.data.rates) {
+          setRate(res.data.rates);
         } else {
           console.warn('⚠ No exchange rates returned from API.');
         }
       })
       .catch(err => console.error('❌ API error:', err));
 
-    // Lắng nghe cập nhật real-time từ WebSocket
+    // Lắng nghe cập nhật real-time
     socket.on('rateUpdate', data => {
       console.log('🔄 Real-time update received:', data);
-      setRate(data); // ✅ Đồng nhất kiểu dữ liệu
+      setRate(data);
     });
 
     return () => {
@@ -40,6 +45,7 @@ function App() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 text-gray-800">
+      {/* Header */}
       <header className="bg-white shadow sticky top-0 z-50">
         <div className="container mx-auto flex justify-between items-center p-4">
           <div className="flex items-center space-x-2">
@@ -55,13 +61,15 @@ function App() {
         </div>
       </header>
 
+      {/* Main content */}
       <main className="container mx-auto flex-1 p-6">
         <Routes>
           <Route path="/" element={
             rate && Object.keys(rate).length > 0 ? (
               <div className="grid md:grid-cols-2 gap-6">
                 <RateTable rates={rate} />
-                <CurrencyConverter />
+                <CurrencyConverter /> 
+                <CrossRateConverter />;
               </div>
             ) : (
               <div className="flex justify-center items-center h-64">
@@ -69,12 +77,13 @@ function App() {
               </div>
             )
           } />
-          <Route path="/about" element={<p className="text-lg">About Page</p>} />
-          <Route path="/contact" element={<p className="text-lg">Contact Page</p>} />
-          <Route path="/setting" element={<p className="text-lg">Setting Page</p>} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/setting" element={<Setting />} />
         </Routes>
       </main>
 
+      {/* Footer */}
       <footer className="bg-white shadow-inner">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center p-4 text-sm text-gray-600">
           <p>© 2025 FX Rate Dashboard. All rights reserved.</p>
@@ -90,3 +99,4 @@ function App() {
 }
 
 export default App;
+
