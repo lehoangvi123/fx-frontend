@@ -11,6 +11,10 @@ import './App.css';
 import CrossRateConverter from './components/CrossRateConverter';
 import RatesFromSources from './components/RateFromSources'
 import RateChart from './components/RateChart';
+import ExchangeRateDisplay from './components/ExchangeRateDisplay'
+import TechnicalIndicators from './components/TechnicalIndicator';
+
+
 // Biến môi trường cho backend
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
@@ -71,7 +75,9 @@ function App() {
                 <CurrencyConverter /> 
                 <CrossRateConverter />; 
                 <RatesFromSources /> 
-                <RateChart />
+                <RateChart /> 
+                <ExchangeRateDisplay /> 
+                <TechnicalIndicators />
               </div>
             ) : (
               <div className="flex justify-center items-center h-64">
