@@ -13,7 +13,7 @@ import RatesFromSources from './components/RateFromSources'
 import RateChart from './components/RateChart';
 import ExchangeRateDisplay from './components/ExchangeRateDisplay'
 import TechnicalIndicators from './components/TechnicalIndicator';
-
+// import MarketSummary from './components/MarketSummary'
 
 // Biến môi trường cho backend
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
@@ -71,13 +71,15 @@ function App() {
           <Route path="/" element={
             rate && Object.keys(rate).length > 0 ? (
               <div className="grid md:grid-cols-2 gap-6">
-                <RateTable rates={rate} />
+                <RateTable rates={rate} /> 
+                {/* <MarketSummary /> */}
                 <CurrencyConverter /> 
                 <CrossRateConverter />; 
                 <RatesFromSources /> 
                 <RateChart /> 
                 <ExchangeRateDisplay /> 
-                <TechnicalIndicators />
+                <TechnicalIndicators /> 
+
               </div>
             ) : (
               <div className="flex justify-center items-center h-64">
@@ -85,6 +87,8 @@ function App() {
               </div>
             )
           } />
+         
+          {/* <Route path="/summary" element={<MarketSummary />} /> */}
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/setting" element={<Setting />} />
