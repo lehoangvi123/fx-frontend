@@ -14,7 +14,7 @@ import RateChart from './components/RateChart';
 import ExchangeRateDisplay from './components/ExchangeRateDisplay'
 import TechnicalIndicators from './components/TechnicalIndicator';
 import MarketSummary from './components/MarketSummary'
-
+import HistoryChart from './components/HistoryChart'
 // Biến môi trường cho backend
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
@@ -79,7 +79,9 @@ function App() {
                 <RateChart /> 
                 <ExchangeRateDisplay /> 
                 <TechnicalIndicators /> 
-                <MarketSummary /> 
+                <MarketSummary />  
+                   <HistoryChart period="24h" />
+                  <HistoryChart period="7d" />
 
               </div>
             ) : (
