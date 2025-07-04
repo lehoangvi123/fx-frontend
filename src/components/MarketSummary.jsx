@@ -1,46 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import io from 'socket.io-client';
 
-const MarketSummary = () => {
+const socket = io('http://localhost:5000'); // Thay đổi nếu backend khác port
+
+export default function MarketSummary() {
   const [summary, setSummary] = useState(null);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/rates/summary')
-      .then((res) => {
-        if (res.data && res.data.success) {
-          setSummary(res.data.summary);
-        }
-      })
-      .catch((err) => {
-        console.error('❌ Lỗi khi lấy dữ liệu tóm tắt thị trường:', err);
-      });
+    socket.on('marketSummary', (data) => {
+      console.log('📦 Nhận marketSummary:', data);
+      setSummary(data);
+    });
+
+    return () => socket.off('marketSummary');
   }, []);
 
-  if (!summary) {
-    return <p>⏳ Đang tải tóm tắt thị trường...</p>;
+  if (!summary || !summary.topGainer || !summary.topLoser) {
+    return <div>⏳ Đang tải tóm tắt thị trường...</div>;
   }
 
   return (
     <div style={{
-      maxWidth: '600px',
-      margin: '30px auto',
-      padding: '20px',
-      backgroundColor: '#f7f9fc',
+      marginTop: '20px',
+      padding: '16px',
+      backgroundColor: '#f5f5f5',
       borderRadius: '10px',
-      boxShadow: '0 0 10px rgba(0,0,0,0.05)',
-      fontFamily: 'Arial, sans-serif'
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
     }}>
-      <h2 style={{ textAlign: 'center' }}>📈 Market Summary</h2>
-
-      <p><strong>📊 Trung bình biến động:</strong> {summary.avgChange}%</p>
-      <p><strong>🧠 Nhận định:</strong> {summary.sentiment}</p>
-
-      <hr />
-
-      <p><strong>📈 Đồng tăng mạnh nhất:</strong> {summary.topGainer.currency} ({summary.topGainer.changePercent.toFixed(2)}%)</p>
-      <p><strong>📉 Đồng giảm mạnh nhất:</strong> {summary.topLoser.currency} ({summary.topLoser.changePercent.toFixed(2)}%)</p>
+      <h3>📊 Tóm tắt thị trường</h3>
+      <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
+        <li>🔺 <strong>Tăng mạnh nhất:</strong> {summary.topGainer.currency} ({summary.topGainer.changePercent?.toFixed(2) ?? 0}%)</li>
+        <li>🔻 <strong>Giảm mạnh nhất:</strong> {summary.topLoser.currency} ({summary.topLoser.changePercent?.toFixed(2) ?? 0}%)</li>
+        <li>📉 <strong>Biến động trung bình:</strong> {summary.avgChange}%</li>
+        <li>📈 <strong>Tâm lý thị trường:</strong> {summary.sentiment}</li>
+      </ul>
     </div>
   );
-};
-
-export default MarketSummary;
+}
